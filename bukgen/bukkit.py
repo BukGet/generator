@@ -226,8 +226,8 @@ class Parser(base.BaseParser):
                 for filename in zfile.namelist():
                     if not yml and filename[-3:].lower() in ['zip', 'jar']:
                         data = StringIO()
-                        yml = self._find_plugin_yaml(\
-                            data.write(zfile.read(filename)))
+                        data.write(zfile.read(filename))
+                        yml = self._find_plugin_yaml(data)
                         data.close()
                 zfile.close()
         return yml
