@@ -100,7 +100,7 @@ db = connection.bukget
 # actual data that failed to insert.
 if not os.path.exists(config.get('Settings', 'json_dump')):
     os.makedirs(config.get('Settings', 'json_dump'))
-if not os.path.exists('/tmp/bukget/json_dicts')
+if not os.path.exists('/tmp/bukget/json_dicts'):
     os.makedirs('/tmp/bukget/json_dicts')
 
 
