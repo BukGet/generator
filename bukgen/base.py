@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 from bson.code import Code
 from hashlib import md5
 from urllib2 import urlopen, HTTPError, URLError
+import requests
 from BeautifulSoup import BeautifulSoup
 from ConfigParser import ConfigParser
 import logging
@@ -105,6 +106,7 @@ if not os.path.exists(config.get('Settings', 'json_dump')):
 class BaseParser(threading.Thread):
     config_delay = 2
     config_api_host = 'localhost:9123'
+    ua_string = 'Mozilla/5.0 (BukGet)'
     _timer = 0
     
     def _get_page(self, url):
@@ -129,19 +131,29 @@ class BaseParser(threading.Thread):
         tries = 0
         while not comp:
             try:
-                data = urlopen(url, timeout=5).read()
-                comp = True
-            except HTTPError, msg:
-                if msg.code != 200:
-                    tries += 1
-                    log.error('PARSER: URL returned %s Code %s' % (msg.code, url))
-                    if tries > 3:
-                        break
-                    time.sleep(self.config_delay)
+                #data = urlopen(url, timeout=5).read()
+                if tries > 3:
+                    break
                 else:
-                    log.warn('PARSER: Connection to "%s" failed, retrying...' % url)
-                    time.sleep(self.config_delay)
+                    response = requests.get(url, headers={'User-Agent': self.ua_string})
+                    if response.ok:
+                        comp = True
+                        data = response.text
+                    else:
+                        tries += 1
+                        log.error('PARSER: URL returned %s Code %s' % (response.status_code, url))
+            #except HTTPError, msg:
+            #    if msg.code != 200:
+            #        tries += 1
+            #        log.error('PARSER: URL returned %s Code %s' % (msg.code, url))
+            #        if tries > 3:
+            #            break
+            #        time.sleep(self.config_delay)
+            #    else:
+            #        log.warn('PARSER: Connection to "%s" failed, retrying...' % url)
+            #        time.sleep(self.config_delay)
             except:
+                tries += 1
                 log.warn('PARSER: Connection to "%s" failed, retrying...' % url)
                 time.sleep(self.config_delay)
         return data

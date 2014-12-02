@@ -15,8 +15,12 @@ def manual_update():
             fname = os.path.join(fixpath, fname)
             with open(fname) as jfile:
                 update = json.loads(jfile.read())
-            oid = db.plugins.find_one({'slug': update['slug'], 'server': update['server']})['_id']
-            update['_id'] = oid
+            oid = None
+            try:
+                oid = db.plugins.find_one({'slug': update['slug'], 'server': update['server']})['_id']
+                update['_id'] = oid
+            except:
+                pass
             print 'Updating %s using ObjectId %s' % (update['slug'], oid)
             db.plugins.save(update)
             os.remove(fname)
