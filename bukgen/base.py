@@ -140,7 +140,7 @@ class BaseParser(threading.Thread):
                     response = requests.get(url, headers={'User-Agent': self.ua_string})
                     if response.ok:
                         comp = True
-                        data = response.text
+                        data = response.content
                     else:
                         tries += 1
                         log.error('PARSER: URL returned %s Code %s' % (response.status_code, url))
